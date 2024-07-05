@@ -112,7 +112,7 @@ class MergeBot(Client):
 mergeApp = MergeBot(
     name="MergeBot",
     api_hash=Config.API_HASH,
-    api_id=int(Config.API_ID),
+    api_id=Config.API_ID,
     bot_token=Config.BOT_TOKEN,
     workers=300,
     plugins=dict(root="plugins"),
