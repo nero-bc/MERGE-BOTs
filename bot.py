@@ -104,16 +104,16 @@ class MergeBot(Client):
         return LOGGER.info("**Bot Stopped**")
 
 
+
 mergeApp = MergeBot(
-    name="MERGEBOTNEW",
+    name="merge-bot",
     api_hash=Config.API_HASH,
-    api_id=int(Config.TELEGRAM_API),
+    api_id=Config.API_ID,
     bot_token=Config.BOT_TOKEN,
     workers=300,
     plugins=dict(root="plugins"),
-    app_version="5.0+yash-mergebot",
+    app_version="7.0+StupidBoi69",
 )
-
 
 if os.path.exists("downloads") == False:
     os.makedirs("downloads")
