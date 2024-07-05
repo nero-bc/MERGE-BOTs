@@ -9,26 +9,26 @@ from __init__ import LOGGER, gDict, queueDB
 import os
 from bot import delete_all
 from helpers.display_progress import Progress
-from helpers.ffmpeg_helper import extractAudios, extractSubtitles
+from helpers.ffmpeg_helper import extractVideos, extractAudios, extractSubtitles
 from helpers.uploader import uploadFiles
 
-async def streamsExtractor(c: Client, cb:CallbackQuery ,media_mid, exAudios=False, exSubs=False):
+async def streamsExtractor(c: Client, cb:CallbackQuery ,media_mid, exAudios=False, exSubs=False, exVideos=False):
     if not os.path.exists(f"downloads/{str(cb.from_user.id)}/"):
         os.makedirs(f"downloads/{str(cb.from_user.id)}/")
-    _hold = await cb.message.edit(text="**Please wait...**")
+    _hold = await cb.message.edit(text="Please wait")
     omess:Message = await c.get_messages(chat_id=cb.from_user.id, message_ids=media_mid)
     try:
         if (omess.video or omess.document):
             media = omess.video or omess.document
-            LOGGER.info(f'**Downloading started of...\n{media.file_name}**')
+            LOGGER.info(f'Starting Download: {media.file_name}')
     except Exception as e:
-        LOGGER.error(f"**Downloading failed: Unable to find media\n{e}**")
+        LOGGER.error(f"Download failed: Unable to find media {e}")
         return
     c.stream_media(media,)
     try:
         c_time = time.time()
         prog = Progress(cb.from_user.id, c, cb.message)
-        progress=f"**Downloading:\n{media.file_name}**"
+        progress=f"🚀 Downloading: `{media.file_name}`"
         file_dl_path = await c.download_media(
             message=media,
             file_name=f"downloads/{str(cb.from_user.id)}/{str(omess.id)}/vid.mkv",  # fix for filename with single quote(') in name
@@ -37,27 +37,31 @@ async def streamsExtractor(c: Client, cb:CallbackQuery ,media_mid, exAudios=Fals
         )
         if gDict[cb.message.chat.id] and cb.message.id in gDict[cb.message.chat.id]:
             return
-        await cb.message.edit(f"**Downloading completed...\n{media.file_name}**")
-        LOGGER.info(f"**Downloading completed...\n{media.file_name}**")
+        await cb.message.edit(f"Downloaded Sucessfully ... `{media.file_name}`")
+        LOGGER.info(f"Downloaded Sucessfully ... {media.file_name}")
         await asyncio.sleep(5)
     except UnknownError as e:
         LOGGER.info(e)
         pass
     except Exception as downloadErr:
-        LOGGER.info(f"**Failed to download Error:\n{downloadErr}**")
-        await cb.message.edit("**Download Error**")
+        LOGGER.info(f"Failed to download Error: {downloadErr}")
+        await cb.message.edit("Download Error")
         await asyncio.sleep(4)
-    await _hold.edit_text("**Fetching data**")
+    await _hold.edit_text("Fetching data")
     await asyncio.sleep(3)
+    if exVideos:
+        await _hold.edit_text("Extracting Videos")
+        extract_dir = await extractVideos(file_dl_path, cb.from_user.id)
     if exAudios:
-        await _hold.edit_text("**Extracting Audios...**")
+        await _hold.edit_text("Extracting Audios")
         extract_dir = await extractAudios(file_dl_path,cb.from_user.id)
     if exSubs:
-        await _hold.edit_text("**Extracting Subtitles...**")
+        await _hold.edit_text("Extracting Subtitles")
         extract_dir = await extractSubtitles(file_dl_path, cb.from_user.id)
 
+    
     if extract_dir is None:
-        await cb.message.edit("**Failed to Extract Streams !**")
+        await cb.message.edit("❌ Failed to Extract Streams !")
         await delete_all(root=f"downloads/{str(cb.from_user.id)}")
         queueDB.update({cb.from_user.id: {"videos": [], "subtitles": [], "audios": []}})
         return
@@ -76,9 +80,10 @@ async def streamsExtractor(c: Client, cb:CallbackQuery ,media_mid, exAudios=Fals
                 all=no_of_files,
             )
             cf+=1
-            LOGGER.info(f"**Uploaded:\n{up_path}**")
+            LOGGER.info(f"Uploaded: {up_path}")
     await cb.message.delete()
     await delete_all(root=f"downloads/{str(cb.from_user.id)}")
     queueDB.update({cb.from_user.id: {"videos": [], "subtitles": [], "audios": []}})
     
     return
+          
