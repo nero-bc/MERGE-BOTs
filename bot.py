@@ -586,8 +586,8 @@ async def media_extracter(c: Client, m: Message):
                 await m.reply("**File name not found; Contact @StupidBoi69**")
                 return
             markup = bMaker.makebuttons(
-                set1=["Video", "Audio", "Subtitle", "Cancel"],
-                set2=[f"extract_video_{mid}", f"extract_audio_{mid}", f"extract_subtitle_{mid}", 'cancel'],
+                set1=["Audio", "Subtitle", "Cancel"],
+                set2=[f"extract_audio_{mid}", f"extract_subtitle_{mid}", 'cancel'],
                 isCallback=True,
                 rows=2,
             )
