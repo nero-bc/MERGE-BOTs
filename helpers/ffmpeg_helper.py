@@ -13,14 +13,14 @@ from helpers.utils import get_path_size
 
 async def MergeVideo(input_file: str, user_id: int, message: Message, format_: str):
     """
-    <b>This is for Merging Videos Together!
-    :param input_file: input.txt file's location.
-    :param user_id: Pass user_id as integer.
-    :param message: Pass Editable Message for Showing FFmpeg Progress.
-    :param format_: Pass File Extension.
-    :return: This will return Merged Video File Path</b>
+    This is for Merging Videos Together!
+    :param `input_file`: input.txt file's location.
+    :param `user_id`: Pass user_id as integer.
+    :param `message`: Pass Editable Message for Showing FFmpeg Progress.
+    :param `format_`: Pass File Extension.
+    :return: This will return Merged Video File Path
     """
-    output_vid = f"downloads/{str(user_id)}/@Anime_Elixir.{format_.lower()}"
+    output_vid = f"downloads/{str(user_id)}/[@Rokubotz].{format_.lower()}"
     file_generator_command = [
         "ffmpeg",
         "-f",
@@ -44,11 +44,11 @@ async def MergeVideo(input_file: str, user_id: int, message: Message, format_: s
         )
     except NotImplementedError:
         await message.edit(
-            text="**Unable to Execute FFmpeg Command! Got NotImplementedError...\n\nPlease run bot in a Linux/Unix Environment.**"
+            text="Unable to Execute FFmpeg Command! Got `NotImplementedError` ...\n\nPlease run bot in a Linux/Unix Environment."
         )
         await asyncio.sleep(10)
         return None
-    await message.edit("**Video is merging; please wait.**")
+    await message.edit("Merging Video Now ...\n\nPlease Keep Patience ...")
     stdout, stderr = await process.communicate()
     e_response = stderr.decode().strip()
     t_response = stdout.decode().strip()
@@ -62,14 +62,14 @@ async def MergeVideo(input_file: str, user_id: int, message: Message, format_: s
 
 async def MergeSub(filePath: str, subPath: str, user_id):
     """
-    <b>This is for Merging Video + Subtitle Together.
+    This is for Merging Video + Subtitle Together.
 
     Parameters:
-    - filePath : Path to Video file.
-    - subPath: Path to subtitile file.
-    - user_id: To get parent directory.
+    - `filePath`: Path to Video file.
+    - `subPath`: Path to subtitile file.
+    - `user_id`: To get parent directory.
 
-    returns: Merged Video File Path</b>
+    returns: Merged Video File Path
     """
     LOGGER.info("Generating mux command")
     muxcmd = []
@@ -95,34 +95,34 @@ async def MergeSub(filePath: str, subPath: str, user_id):
             subTrack += 1
     muxcmd.append(f"-metadata:s:s:{subTrack}")
     subTrack += 1
-    subTitle = f"Track {subTrack} - (@Anime_Elixir)"
+    subTitle = f"Track {subTrack} - tg@Rokubotz"
     muxcmd.append(f"title={subTitle}")
     muxcmd.append("-c:v")
     muxcmd.append("copy")
     muxcmd.append("-c:a")
     muxcmd.append("copy")
     muxcmd.append("-c:s")
-    muxcmd.append("srt")
-    muxcmd.append(f"./downloads/{str(user_id)}/@Anime_Elixir.mkv")
+    muxcmd.append("copy")
+    muxcmd.append(f"./downloads/{str(user_id)}/[@Rokubotz]_softmuxed_video.mkv")
     LOGGER.info("Muxing subtitles")
     subprocess.call(muxcmd)
     orgFilePath = shutil.move(
-        f"downloads/{str(user_id)}/@Anime_Elixir video.mkv", filePath
+        f"downloads/{str(user_id)}/[@Rokubotz]_softmuxed_video.mkv", filePath
     )
     return orgFilePath
 
 
 def MergeSubNew(filePath: str, subPath: str, user_id, file_list):
     """
-    <b>This method is for Merging Video + Subtitle(s) Together.
+    This method is for Merging Video + Subtitle(s) Together.
 
     Parameters:
-    - filePath: Path to Video file.
-    - subPath: Path to subtitile file.
-    - user_id: To get parent directory.
-    - file_list`: List of all input files
+    - `filePath`: Path to Video file.
+    - `subPath`: Path to subtitile file.
+    - `user_id`: To get parent directory.
+    - `file_list`: List of all input files
 
-    returns: Merged Video File Path</b>
+    returns: Merged Video File Path
     """
     LOGGER.info("Generating mux command")
     muxcmd = []
@@ -147,18 +147,18 @@ def MergeSubNew(filePath: str, subPath: str, user_id, file_list):
         muxcmd.append("-map")
         muxcmd.append(f"{j}:s")
         muxcmd.append(f"-metadata:s:s:{subTrack}")
-        muxcmd.append(f"title=Track {subTrack+1} - (@Anime_Elixir)")
+        muxcmd.append(f"title=Track {subTrack+1} - tg@Rokubotz")
         subTrack += 1
     muxcmd.append("-c:v")
     muxcmd.append("copy")
     muxcmd.append("-c:a")
     muxcmd.append("copy")
     muxcmd.append("-c:s")
-    muxcmd.append("srt")
-    muxcmd.append(f"./downloads/{str(user_id)}/@Anime_Elixir.mkv")
+    muxcmd.append("copy")
+    muxcmd.append(f"./downloads/{str(user_id)}/[@Rokubotz]_softmuxed_video.mkv")
     LOGGER.info("Sub muxing")
     subprocess.call(muxcmd)
-    return f"downloads/{str(user_id)}/@Anime_Elixir.mkv"
+    return f"downloads/{str(user_id)}/[@Rokubotz]_softmuxed_video.mkv"
 
 
 def MergeAudio(videoPath: str, files_list: list, user_id):
@@ -187,7 +187,7 @@ def MergeAudio(videoPath: str, files_list: list, user_id):
         muxcmd.append("-map")
         muxcmd.append(f"{j}:a")
         muxcmd.append(f"-metadata:s:a:{audioTracks}")
-        muxcmd.append(f"title=Track {audioTracks+1} - (@Anime_Elixir)")
+        muxcmd.append(f"title=Track {audioTracks+1} - tg@Rokubotz")
         audioTracks += 1
     muxcmd.append(f"-disposition:s:a:{fAudio}")
     muxcmd.append("default")
@@ -199,12 +199,12 @@ def MergeAudio(videoPath: str, files_list: list, user_id):
     muxcmd.append("copy")
     muxcmd.append("-c:s")
     muxcmd.append("copy")
-    muxcmd.append(f"downloads/{str(user_id)}/@Anime_Elixir.mkv")
+    muxcmd.append(f"downloads/{str(user_id)}/[@Rokubotz]_export.mkv")
 
     LOGGER.info(muxcmd)
     process = subprocess.call(muxcmd)
     LOGGER.info(process)
-    return f"downloads/{str(user_id)}/@Anime_Elixir.mkv"
+    return f"downloads/{str(user_id)}/[@Rokubotz]_export.mkv"
 
 
 async def cult_small_video(video_file, output_directory, start_time, end_time, format_):
@@ -244,15 +244,15 @@ async def cult_small_video(video_file, output_directory, start_time, end_time, f
 
 async def take_screen_shot(video_file, output_directory, ttl):
     """
-    <b>This functions generates custom_thumbnail / Screenshot.
+    This functions generates custom_thumbnail / Screenshot.
 
     Parameters:
 
-    - video_file: Path to video file.
-    - output_directory: Path where to save thumbnail
-    - ttl: Timestamp to generate ss
+    - `video_file`: Path to video file.
+    - `output_directory`: Path where to save thumbnail
+    - `ttl`: Timestamp to generate ss
 
-    returns: This will return path of screenshot</b>
+    returns: This will return path of screenshot
     """
     # https://stackoverflow.com/a/13891070/4723940
     out_put_file_name = os.path.join(output_directory, str(time.time()) + ".jpg")
@@ -299,6 +299,53 @@ async def take_screen_shot(video_file, output_directory, ttl):
         return out_put_file_name
     else:
         return None
+
+async def extractVideos(path_to_file, user_id):
+    """
+    docs
+    """
+    dir_name = os.path.dirname(os.path.dirname(path_to_file))
+    if not os.path.exists(path_to_file):
+        return None
+    if not os.path.exists(dir_name + "/extract_videos"):
+        os.makedirs(dir_name + "/extract_videos")
+    
+    videoStreamsData = ffmpeg.probe(path_to_file)
+    extract_dir = dir_name + "/extract_videos"
+    videos = []
+    for stream in videoStreamsData.get("streams"):
+        try:
+            if stream["codec_type"] == "video":
+                videos.append(stream)
+        except Exception as e:
+            LOGGER.warning(e)
+    
+    for video in videos:
+        extractcmd = ["ffmpeg", "-hide_banner", "-i", path_to_file, "-map", f"0:{video['index']}"]
+        
+        try:
+            output_file = f"video_{video['index']}.mkv"
+            extractcmd.extend(["-c", "copy", f"{extract_dir}/{output_file}"])
+            
+            LOGGER.info(extractcmd)
+            subprocess.call(extractcmd)
+        except Exception as e:
+            LOGGER.error(f"Something went wrong: {e}")
+    
+    if get_path_size(extract_dir) > 0:
+        return extract_dir
+    else:
+        LOGGER.warning(f"{extract_dir} is empty")
+        return None
+
+# Additional function to get the size of a directory
+def get_path_size(directory):
+    total_size = 0
+    with os.scandir(directory) as it:
+        for entry in it:
+            if entry.is_file():
+                total_size += entry.stat().st_size
+    return total_size
 
 
 async def extractAudios(path_to_file, user_id):
