@@ -35,13 +35,13 @@ async def userSettings(
             userMergeModeStr = "Video + Subtitle"
         elif usettings.merge_mode == 4:
             userMergeModeId = 4
-            userMergeModeStr = "Extract" 
+            userMergeModeStr = "Extract 🔀" 
         if usettings.edit_metadata:
-            editMetadataStr = "True"
+            editMetadataStr = "🟢 True"
         else:
-            editMetadataStr = "False"
+            editMetadataStr = "🔴 False"
         uSettingsMessage = f"""
-<b><u><a href='tg://user?id={uid}'>{fname} {lname}</a></u></b>
+<b><u><a href='tg://user?id={uid}'>{fname}</a></u></b>
 ╭──────────────────────
 ┣**🎭 UserID: <u>{usettings.user_id}</u>**
 ┣**{'🪹' if usettings.banned else '🪺'} Ban Status: <u>{usettings.banned}</u>**
@@ -52,11 +52,11 @@ async def userSettings(
 """
         markup = b.makebuttons(
             [
-                "Merge mode",
+                "Merge Mode ↪️",
                 userMergeModeStr,
-                "Edit Metadata",
+                "Edit Metadata ↪️",
                 editMetadataStr,
-                "Close",
+                "📴 Close",
             ],
             [
                 "tryotherbutton",
