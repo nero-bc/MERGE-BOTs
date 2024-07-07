@@ -129,38 +129,6 @@ async def sendLogFile(c: Client, m: Message):
     await m.reply_document(document="./mergebotlog.txt")
     return
 
-'''
-@mergeApp.on_message(filters.command(["login"]) & filters.private)
-async def loginHandler(c: Client, m: Message):
-    user = UserSettings(m.from_user.id, m.from_user.first_name)
-    if user.banned:
-        await m.reply_text(text=f"**Banned User Detected!**\n  🛡️ Unfortunately you can't use me\n\n𝖢𝗈𝗇𝗍𝖺𝖼𝗍 ➜ <a href=https://t.me/Snowball_Official>𝖮𝗐𝗇𝖾𝗋</a>",quote=True)
-        return
-    if user.user_id == int(Config.OWNER):
-        user.allowed = True
-    if user.allowed:
-        await m.reply_text(text=f"**Dont Spam**\n  ⚡ You can use me!!", quote=True)
-    else:
-        try:
-            passwd = m.text.split(" ", 1)[1]
-        except:
-            await m.reply_text("**Command:**\n  `/login <password>`\n\n**Usage:**\n  `password`: Get the password from owner",quote=True,parse_mode=enums.parse_mode.ParseMode.MARKDOWN)
-        passwd = passwd.strip()
-        if passwd == Config.PASSWORD:
-            user.allowed = True
-            await m.reply_text(
-                text=f"**Login passed ✅,**\n  ⚡ Now you can use me!!", quote=True
-            )
-        else:
-            await m.reply_text(
-                text=f"**Login failed ❌,**\n  🛡️ Unfortunately you can't use me\n\n𝖢𝗈𝗇𝗍𝖺𝖼𝗍 ➜ <a href=https://t.me/Snowball_Official>𝖮𝗐𝗇𝖾𝗋</a>",
-                quote=True,
-            )
-    user.set()
-    del user
-    return
-'''
-
 
 @mergeApp.on_message(filters.command(["stats"]) & filters.private)
 async def stats_handler(c: Client, m: Message):
@@ -301,18 +269,6 @@ Hit /help to learn, how to use this bot.</b>""",
         ),
     )
 
-'''
-    res = await m.reply_text(
-        text=f"""<b>
-Hi There; {m.from_user.mention}!
-
-I'm merge bot, I can merge videos / audios / subtitles.
-And, I am also capable of extracting <u>audios</u> and <u>subtitles</u> from the video.
-
-Hit /help to find out more about how to use me to my full potential.</b>""",
-        quote=True,
-    )
-'''
 
 @mergeApp.on_message(
     (filters.document | filters.video | filters.audio) & filters.private)
@@ -342,22 +298,6 @@ Your verification is expired, click on below button and complete the verificatio
         elif int(result["time_out"]) < get_current_time():
             ad_code = str_to_b64(f"{uid}:{str(get_current_time() + 86400)}") #Timeout
             ad_url = shorten_url(f"https://t.me/{bot_username}?start={ad_code}") 
-            await c.send_message(
-                m.chat.id,
-                f"""<b>ℹ️ Hi {m.from_user.mention},
-Your verification is expired, click on below button and complete the verification to get access.</b>""",
-                disable_web_page_preview=True,
-                reply_markup=InlineKeyboardMarkup(
-                    [[
-                        InlineKeyboardButton("↪️ Get free access for 24-hrs ↩️", url=ad_url)
-                    ]]
-                ),
-                reply_to_message_id=m.id,
-            )
-            return
-        elif int(result["time_out"]) < get_current_time():
-            ad_code = str_to_b64(f"{uid}:{str(get_current_time() + 86400)}") #Timeout
-            ad_url = shorten_url(f"https://t.me/{bot_username}?start={ad_code}")
             await c.send_message(
                 m.chat.id,
                 f"""<b>ℹ️ Hi {m.from_user.mention},
@@ -549,14 +489,7 @@ Your verification is expired, click on below button and complete the verificatio
 async def photo_handler(c: Client, m: Message):
     user = UserSettings(m.chat.id, m.from_user.first_name)
     # if m.from_user.id != int(Config.OWNER):
-    if not user.allowed:
-        res = await m.reply_text(
-            text=f"""<b>ℹ️ Hi {m.from_user.first_name},
-Unfortunately you can't use me, Contact @StupidBoi69</b>""",
-            quote=True,
-        )
-        del user
-        return
+    
     thumbnail = m.photo.file_id
     msg = await m.reply_text("**⏺️ Saving Thumbnail....**", quote=True)
     user.thumbnail = thumbnail
@@ -571,8 +504,7 @@ Unfortunately you can't use me, Contact @StupidBoi69</b>""",
 @mergeApp.on_message(filters.command(["extract"]) & filters.private)
 async def media_extracter(c: Client, m: Message):
     user = UserSettings(uid=m.from_user.id, name=m.from_user.first_name)
-    if not user.allowed:
-        return
+    
     if user.merge_mode == 4:
         if m.reply_to_message is None:
             await m.reply(text="<b>Reply /extract to a video or document file</b>")
@@ -648,14 +580,10 @@ async def about_handler(c: Client, m: Message):
         quote=True,
         reply_markup=InlineKeyboardMarkup(
             [
-                [InlineKeyboardButton("Purchase Premium Membership", url=f"https://t.me/{Config.OWNER_USERNAME}")],
+                [InlineKeyboardButton("💰 Purchase Premium Membership", url=f"https://t.me/{Config.OWNER_USERNAME}")],
                 [
-                    InlineKeyboardButton(
-                        "Source Code", url=f"www.google.com"
-                    ),
-                    InlineKeyboardButton(
-                        "Feedback", url=f"https://t.me/{Config.OWNER_USERNAME}"
-                    ),
+                    InlineKeyboardButton("Source Code", url=f"t.me/StupidBoi69"),
+                    InlineKeyboardButton("Feedback", url=f"https://t.me/{Config.OWNER_USERNAME}")
                 ],
                 [InlineKeyboardButton("📴 Close", callback_data="close")],
             ]
