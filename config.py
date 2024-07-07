@@ -1,4 +1,3 @@
-
 import os
 
 class Config(object):
@@ -14,7 +13,7 @@ class Config(object):
     USER_SESSION_STRING = os.environ.get("USER_SESSION_STRING", None)
     
     IS_PREMIUM = True
-    PAID_BOT = YES
+    PAID_BOT = os.environ.get("PAID_BOT")
     
     BOT_USERNAME = os.environ.get("BOT_USERNAME")
     SHORTENER_SITE = os.environ.get("SHORTENER_SITE")
