@@ -58,7 +58,7 @@ async def mergeAudio(c: Client, cb: CallbackQuery, new_file_name: str):
                 progress=prog.progress_for_pyrogram,
                 progress_args=(f"**Downloading:\n{media.file_name}**", c_time, f"\n**Processing: {n}/{all}**"),
             )
-            n+=1
+            n += 1
             if gDict[cb.message.chat.id] and cb.message.id in gDict[cb.message.chat.id]:
                 return
             await cb.message.edit(f"**Downloading completed...\n{media.file_name}**")
@@ -66,22 +66,39 @@ async def mergeAudio(c: Client, cb: CallbackQuery, new_file_name: str):
             await asyncio.sleep(4)
         except Exception as downloadErr:
             LOGGER.warning(f"**Failed to download Error:\n{downloadErr}**")
-            queueDB.get(cb.from_user.id)["audios"].remove(i.id)
+            if i.id in queueDB.get(cb.from_user.id)["audios"]:
+                queueDB.get(cb.from_user.id)["audios"].remove(i.id)
             await cb.message.edit("**File Skipped !**")
             await asyncio.sleep(4)
             await cb.message.delete(True)
             continue
         files_list.append(f"{file_dl_path}")
 
-    muxed_video = MergeAudio(files_list[0], files_list, cb.from_user.id)
+    if not files_list or not os.path.exists(files_list[0]):
+        await cb.message.edit("**Failed to find downloaded video file!**")
+        await delete_all(root=f"downloads/{str(cb.from_user.id)}")
+        queueDB.update({cb.from_user.id: {"videos": [], "subtitles": [], "audios": []}})
+        formatDB.update({cb.from_user.id: None})
+        return
+
+    try:
+        muxed_video = MergeAudio(files_list[0], files_list, cb.from_user.id)
+    except Exception as mergeErr:
+        LOGGER.error(f"ffprobe error: {mergeErr}")
+        await cb.message.edit("**Failed to add audio to video!**")
+        await delete_all(root=f"downloads/{str(cb.from_user.id)}")
+        queueDB.update({cb.from_user.id: {"videos": [], "subtitles": [], "audios": []}})
+        formatDB.update({cb.from_user.id: None})
+        return
+
     if muxed_video is None:
-        await cb.message.edit("**Failed to add audio to video !**")
+        await cb.message.edit("**Failed to add audio to video!**")
         await delete_all(root=f"downloads/{str(cb.from_user.id)}")
         queueDB.update({cb.from_user.id: {"videos": [], "subtitles": [], "audios": []}})
         formatDB.update({cb.from_user.id: None})
         return
     try:
-        await cb.message.edit("**Audio to video merging completed !**")
+        await cb.message.edit("**Audio to video merging completed!**")
     except MessageNotModified:
         await cb.message.edit("**Audio to video merging completed !***")
     LOGGER.info(f"**Merged for: {cb.from_user.mention}\nUserID- {cb.from_user.id}**")
